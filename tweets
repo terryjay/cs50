@@ -6,6 +6,7 @@ import nltk
 
 from helpers import get_user_timeline, chart
 from analyzer import Analyzer
+from termcolor import colored
 
 # absolute paths to lists
 positives = os.path.join(sys.path[0], "positive-words.txt")
@@ -18,7 +19,7 @@ analyzer = Analyzer(positives, negatives)
 if len(sys.argv) != 2:
     sys.exit("Usage: ./tweets @username")
     
-tweets = get_user_timeline(sys.argv[1].lstrip("@"), 100)
+tweets = get_user_timeline(sys.argv[1].lstrip("@"), 50)
 
 tokenizer = nltk.tokenize.TweetTokenizer()
 
@@ -35,13 +36,19 @@ for tweet in tweets:
         sub_score = sub_score + analyzer.analyze(token)
     tweet_score.append(sub_score)
     sub_score = 0
-    
-for i in tweet_score:
-    if i < 0:
-        negative = negative + 1
-    if i > 0:
-        positive = positive + 1
-    if i == 0:
-        neutral = neutral + 1
+
+for i, tweet in enumerate(tweets):
+    for j, score in enumerate(tweet_score):
+        if i == j:
+            if score > 0:
+                print(" ",end="")
+                print(colored(score, "green"), end=" ")
+                print(colored(tweet, "green"))
+            elif score < 0:
+                print(colored(score, "red"), end=" ")
+                print(colored(tweet, "red"))
+            else:
+                print(" ",end="")
+                print(colored(score, "yellow"), end=" ")
+                print(colored(tweet, "yellow"))
         
-plot = chart(positive, negative, neutral)
