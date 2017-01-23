@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import nltk
+
+from helpers import get_user_timeline, chart
+from analyzer import Analyzer
+
+# absolute paths to lists
+positives = os.path.join(sys.path[0], "positive-words.txt")
+negatives = os.path.join(sys.path[0], "negative-words.txt")
+
+# instantiate analyzer
+analyzer = Analyzer(positives, negatives)
+
+# ensure proper usage
+if len(sys.argv) != 2:
+    sys.exit("Usage: ./tweets @username")
+    
+tweets = get_user_timeline(sys.argv[1].lstrip("@"), 100)
+
+tokenizer = nltk.tokenize.TweetTokenizer()
+
+sub_score = 0
+tweet_score = []
+positive = 0
+negative = 0
+neutral = 0
+
+for tweet in tweets:
+    tokens = tokenizer.tokenize(tweet)
+    # print(tokens)
+    for token in tokens:
+        sub_score = sub_score + analyzer.analyze(token)
+    tweet_score.append(sub_score)
+    sub_score = 0
+    
+for i in tweet_score:
+    if i < 0:
+        negative = negative + 1
+    if i > 0:
+        positive = positive + 1
+    if i == 0:
+        neutral = neutral + 1
+        
+plot = chart(positive, negative, neutral)
