@@ -30,6 +30,9 @@ def search():
     # instantiate analyzer
     analyzer = Analyzer(positives, negatives)
 
+    # TODO
+    # probably would be better for me to put this in its own .py file and call it that way rather than making this
+    # code more complex
     tokenizer = nltk.tokenize.TweetTokenizer()
     
     sub_score = 0
